@@ -72,4 +72,4 @@
         buf (vec (repeat buf-size 0))
         [buf read] (push-to-vec buf xs look-ahead)
         look-ahead (min read look-ahead)]
-    (encode* (drop read xs) buf look-ahead)))
+    (map ubyte->byte (encode* (drop read xs) buf look-ahead))))

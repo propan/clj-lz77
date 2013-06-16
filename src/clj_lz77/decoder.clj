@@ -31,12 +31,17 @@
         (let [c (bit-xor c 0x80)]
           (lazy-cat [32 c] (decode* (rest xs) (conj dict 32 c))))
 
-        :else (let [[distance length] (decode-pair c (second xs))
-                    [bytes dict] (copy-by-reference dict distance length)]
-                (lazy-cat bytes (decode* (drop 2 xs) dict)))
+        :else
+        (let [[distance length] (decode-pair c (second xs))]
+                (if (pos? distance)
+                  (let [[bytes dict] (copy-by-reference dict distance length)]
+                    (lazy-cat bytes (decode* (drop 2 xs) dict)))
+                  (do
+                    (println ":(")
+                    (lazy-cat [c] (decode* (drop 1 xs) dict)))))
         ))))
 
 (defn decode
   "Produces a sequence decompressed with LZ77 algorithm."
   [xs]
-  (decode* (map byte->ubyte xs) []))
+  (map ubyte->byte (decode* (map byte->ubyte xs) [])))

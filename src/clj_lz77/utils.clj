@@ -19,6 +19,11 @@
       (subvec v overflow)
       v)))
 
+(defn ubyte->byte
+  "Returns the value of the given unsigned byte as an byte."
+  [^long x]
+  (.byteValue (Integer/valueOf x)))
+
 (defn byte->ubyte
   "Returns the value of the given byte as an integer, when treated as unsigned."
   [^long x]
@@ -30,7 +35,7 @@
   (let [compound (+ (bit-shift-left distance 3) length -3)
         b0 (+ 0x80 (bit-shift-right compound 8))
         b1 (bit-and compound 0xFF)]
-    [(.byteValue b0) (.byteValue b1)]))
+    [b0 b1]))
 
 (defn decode-pair
   "Decodes two bytes into a destance-length pair."
