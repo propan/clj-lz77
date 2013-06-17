@@ -15,7 +15,7 @@
 
 (defn to-string
   [xs]
-  (apply str (map #(char (bit-and % 255)) xs)))
+  (String. (into-array Byte/TYPE xs)))
 
 (deftest test-encode-decode
   (testing

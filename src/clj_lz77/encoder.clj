@@ -10,19 +10,20 @@
         clj-lz77.constants))
 
 (defn- find-match
-  [s start limit]
-  (loop [position 0 match-start 0 match-length 0 search (subvec s start (inc start))]
-    (let [search-length (count search)
-          next-bound (+ start search-length 1)]
-      (if (or (>= position start)
-            (>= next-bound (- (count s) limit)))
+  [src start limit min-match]
+  (let [search-bound (- (count src) limit)]
+    (loop [position 0 match-start 0 match-length 0 search-length min-match]
+      (if (or
+            (>= position start)
+            (> (+ start search-length) search-bound))
         (if (zero? match-length)
-          [0 0 (s start)]
-          [(- start match-start) match-length (s (+ start match-length))])
-        (let [match (subvec s position (+ position search-length))]
-          (if (= match search)
-            (recur position position search-length (subvec s start next-bound))
-            (recur (inc position) match-start match-length search)))))))
+          [0 0 (get src (+ start match-length))]
+          [(- start match-start) match-length (get src (+ start match-length))])
+        (let [search (subvec src start (+ start search-length))
+              match-try (subvec src position (+ position search-length))]
+          (if (= match-try search)
+            (recur position position search-length (inc search-length))
+            (recur (inc position) match-start match-length search-length)))))))
 
 (defn- literal?
   [^long x]
@@ -36,13 +37,9 @@
   (let [nnpos (+ position length 1)
         nnval (when (< nnpos (count buffer))
                 (buffer nnpos))]
-
     (cond
       (>= length min-bytes-to-decode)
       [(encode-pair distance length) length]
-
-      (> length 0)
-      [(subvec buffer position (+ position length)) length]
 
       (and
         (= 32 nval)
@@ -64,7 +61,8 @@
 (defn- encode*
   [xs buf look-ahead]
   (if (pos? look-ahead)
-    (let [[distance length nval] (find-match buf default-search-buffer (- default-look-ahead look-ahead))
+    (let [limit (- default-look-ahead look-ahead)
+          [distance length nval] (find-match buf default-search-buffer limit min-bytes-to-decode)
           [ys offset] (produce-output [distance length nval] default-search-buffer buf look-ahead)
           [buf read] (push-to-vec buf xs offset)
           look-ahead (+ (- look-ahead offset) read)]
@@ -74,7 +72,8 @@
 (defn encode
   "Produces a sequence compressed with LZ77 algorithm."
   [xs]
-  (let [look-ahead default-look-ahead
+  (let [xs (map byte->ubyte xs)
+        look-ahead default-look-ahead
         buf-size (+ default-search-buffer look-ahead)
         buf (vec (repeat buf-size 0))
         [buf read] (push-to-vec buf xs look-ahead)

@@ -9,6 +9,17 @@
   (:use clojure.test
         clj-lz77.encoder))
 
+(def find-match #'clj-lz77.encoder/find-match)
+
+(deftest test-find-match
+  (testing
+    "Various combination of matches"
+    (let [src [-30 -128 -100 116 111 112 -30 -128 -99]]
+      (are [start limit res] (= res (find-match src start limit 1))
+        6 0 [6 2 -99]
+        6 1 [6 2 -99]
+        6 2 [6 1 -128]))))
+
 (deftest test-encode
   (testing
     "Correctly encodes sequence of bytes"
