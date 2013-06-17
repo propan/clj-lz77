@@ -38,7 +38,7 @@
           (recur (drop read xs)))))))
 
 (defn- transform-file
-  [src dst tran-fn]
+  [^String src ^String dst tran-fn]
   (with-open [in (.getChannel (FileInputStream. src))
               out (.getChannel (FileOutputStream. dst))]
     (let [input (byte-seq in)

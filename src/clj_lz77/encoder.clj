@@ -10,7 +10,7 @@
         clj-lz77.constants))
 
 (defn- find-match
-  [src start limit min-match]
+  [src ^long start ^long limit ^long min-match]
   (let [search-bound (- (count src) limit)]
     (loop [position 0 match-start 0 match-length 0 search-length min-match]
       (if (or

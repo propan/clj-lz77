@@ -15,7 +15,7 @@
 
 (defn to-string
   [xs]
-  (String. (into-array Byte/TYPE xs)))
+  (String. ^bytes (into-array Byte/TYPE xs)))
 
 (deftest test-encode-decode
   (testing
@@ -34,7 +34,7 @@
       "Bob’s cat was't here!"
       "The word “top” is my favorite.")))
 
-(deftest test-comperss-decompress
+#_(deftest test-comperss-decompress
   (testing
     "Compressing and decopressing produces the original file"
     (compress-file "/tmp/i.md" "/tmp/i.lz77")
