@@ -27,21 +27,20 @@
   [^ByteChannel channel xs]
   (let [buf (ByteBuffer/allocate buffer-size)]
     (loop [xs xs]
-      (let [data (into [] (take (.capacity buf) xs))
+      (let [data (vec (take (.capacity buf) xs))
             read (count data)]
         (when (pos? read)
-          (do
-            (doseq [x data]
-              (.put buf (byte x)))
-            (.flip buf)
-            (.write channel buf)
-            (.clear buf)
-            (recur (drop read xs))))))))
+          (doseq [x data]
+            (.put buf (byte x)))
+          (.flip buf)
+          (.write channel buf)
+          (.clear buf)
+          (recur (drop read xs)))))))
 
 (defn- transform-file
   [src dst tran-fn]
-  (with-open [in (-> (FileInputStream. src) (.getChannel))
-              out (-> (FileOutputStream. dst) (.getChannel))]
+  (with-open [in (.getChannel (FileInputStream. src))
+              out (.getChannel (FileOutputStream. dst))]
     (let [input (byte-seq in)
           output (tran-fn input)]
       (write-seq out output))))

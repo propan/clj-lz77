@@ -21,7 +21,7 @@
 
 (defn- decode*
   [xs dict]
-  (when-not (empty? xs)
+  (when (seq xs)
     (let [c (first xs)
           dict (trim-vec dict default-search-buffer)]
       (cond
@@ -40,12 +40,8 @@
 
         :else
         (let [[distance length] (decode-pair c (second xs))]
-                (if (pos? distance)
-                  (let [[bytes dict] (copy-by-reference dict distance length)]
-                    (lazy-cat bytes (decode* (drop 2 xs) dict)))
-                  (do
-                    (println ":(")
-                    (lazy-cat [c] (decode* (drop 1 xs) dict)))))
+          (let [[bytes dict] (copy-by-reference dict distance length)]
+            (lazy-cat bytes (decode* (drop 2 xs) dict))))
         ))))
 
 (defn decode

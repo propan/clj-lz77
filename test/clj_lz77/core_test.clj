@@ -34,7 +34,7 @@
       "Bob’s cat was't here!"
       "The word “top” is my favorite.")))
 
-#_(deftest test-comperss-decompress
+(deftest test-comperss-decompress
   (testing
     "Compressing and decopressing produces the original file"
     (compress-file "/tmp/i.md" "/tmp/i.lz77")
