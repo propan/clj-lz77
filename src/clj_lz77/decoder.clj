@@ -14,7 +14,7 @@
   (loop [a [] d dict l length]
     (if (pos? l)
       (let [pos (- (count d) distance)
-            s (d pos)]
+            s (get d pos 0)]
         (recur (conj a s) (conj d s) (dec l)))
       [a d])
     ))
