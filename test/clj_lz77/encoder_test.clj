@@ -10,10 +10,21 @@
         clj-lz77.encoder))
 
 (def find-match #'clj-lz77.encoder/find-match)
+(def match? #'clj-lz77.encoder/match?)
+
+(deftest test-match?
+  (testing
+    "Match? validation"
+    (let [src [-30 -128 -100 116 111 112 -30 -128 -99]]
+      (are [pos match res] (= res (match? src match pos))
+        2 [-100 116 111] true
+        2 [-100 116 111] true
+        2 [-100 116 114] false
+        0 [-30 -128 -100 116 111 112 -30 -128 -99] true))))
 
 (deftest test-find-match
   (testing
-    "Various combination of matches"
+    "Various combination of match searches"
     (let [src [-30 -128 -100 116 111 112 -30 -128 -99]]
       (are [start limit res] (= res (find-match src start limit 1))
         6 0 [6 2 -99]
