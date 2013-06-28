@@ -1,4 +1,4 @@
-(defproject clj-lz77 "0.1.0-SNAPSHOT"
+(defproject clj-lz77 "0.1.0"
   :description "an implementation of LZ77 compression algorithm written in Clojure"
   :url "https://github.com/propan/clj-lz77"
   :license {:name "Eclipse Public License"
