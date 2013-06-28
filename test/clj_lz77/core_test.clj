@@ -10,12 +10,20 @@
         clj-lz77.core
         clj-lz77.utils
         clj-lz77.encoder
-        clj-lz77.decoder))
+        clj-lz77.decoder)
+  (:require [clojure.java.io :as io])
+  (:import [java.nio.channels ByteChannel]
+           [java.io FileInputStream FileOutputStream]))
 
+(def byte-seq #'clj-lz77.core/byte-seq)
 
 (defn to-string
   [xs]
   (String. ^bytes (into-array Byte/TYPE xs)))
+
+(defn ^String absolute-path
+  [file]
+  (str (.getPath (io/resource ".")) "../test-resources/" file))
 
 (deftest test-encode-decode
   (testing
@@ -34,8 +42,18 @@
       "Bob’s cat was't here!"
       "The word “top” is my favorite.")))
 
-#_(deftest test-comperss-decompress
+(deftest test-comperss-decompress
   (testing
     "Compressing and decopressing produces the original file"
-    (compress-file "/tmp/i.md" "/tmp/i.lz77")
-    (decompress-file "/tmp/i.lz77" "/tmp/i-r.md")))
+    (let [input (absolute-path "pg76.txt")
+          buffer (absolute-path "pg76.lz77")
+          output (absolute-path "pg76-rtxt")]
+      (compress-file input buffer)
+      (decompress-file buffer output)
+      (with-open [in (.getChannel (FileInputStream. input))
+                  out (.getChannel (FileInputStream. output))]
+        (let [in-seq (byte-seq in)
+              out-seq (byte-seq out)]
+          (is (= in-seq out-seq))))
+      (io/delete-file buffer true)
+      (io/delete-file output true))))
