@@ -10,36 +10,34 @@
         clj-lz77.constants))
 
 (defn- match?
-  [source search ^long pos]
-  (let [search-length (count search)]
-    (loop [i 0]
-      (cond
-        (and
-          (< i search-length)
-          (let [f (source (unchecked-add i pos)) s (search i)]
-            (== f s)))
-        (recur (unchecked-inc i))
+  [source ^long search-start ^long match-start ^long match-length]
+  (loop [i 0]
+    (cond
+      (and
+        (< i match-length)
+        (==
+          (source (unchecked-add i match-start))
+          (source (unchecked-add i search-start))))
+      (recur (unchecked-inc i))
 
-        (>= i search-length)
-        true
+      (>= i match-length)
+      true
 
-        :else false))))
+      :else false)))
 
 (defn- find-match
   [src ^long start ^long limit ^long min-match]
   (let [search-bound (- (count src) limit)]
-    (loop [position 0 match-start 0 match-length 0 search (subvec src start (+ start min-match))]
-      (let [search-length (count search)]
-        (if (>= position start)
+    (loop [position 0 match-start 0 match-length 0 search-length min-match]
+        (if (or
+              (>= position start)
+              (> (unchecked-add start search-length) search-bound))
           (if (zero? match-length)
             [0 0 (get src (+ start match-length))]
             [(- start match-start) match-length (get src (+ start match-length))])
-          (if (match? src search position)
-            (let [next-search-bound (+ start search-length 1)]
-              (if (<= next-search-bound search-bound)
-                (recur position position search-length (subvec src start next-search-bound))
-                (recur start position search-length search)))
-            (recur (inc position) match-start match-length search)))))))
+          (if (match? src start position search-length)
+            (recur position position search-length (inc search-length))
+            (recur (inc position) match-start match-length search-length))))))
 
 (defn- literal?
   [^long x]

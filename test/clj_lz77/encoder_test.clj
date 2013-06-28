@@ -16,11 +16,12 @@
   (testing
     "Match? validation"
     (let [src [-30 -128 -100 116 111 112 -30 -128 -99]]
-      (are [pos match res] (= res (match? src match pos))
-        2 [-100 116 111] true
-        2 [-100 116 111] true
-        2 [-100 116 114] false
-        0 [-30 -128 -100 116 111 112 -30 -128 -99] true))))
+      (are [search match length res] (= res (match? src search match length))
+        0 0 6 true
+        0 0 9 true
+        0 6 2 true
+        0 6 3 false
+        1 4 5 false))))
 
 (deftest test-find-match
   (testing
