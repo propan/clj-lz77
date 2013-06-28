@@ -7,7 +7,7 @@ A Clojure library that performs compression/decompression using LZ77 algorithm.
 Include the library in your leiningen project dependencies:
 
 ```clojure
-[clj-lz77 "0.1.0-SNAPSHOT"]
+[clj-lz77 "0.1.0"]
 ```
 
 ## Examples
